@@ -1,0 +1,84 @@
+/* Global styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: rgb(0, 123, 255);
+  --primary-dark: rgb(0, 98, 204);
+  --secondary-color: rgb(108, 117, 125);
+  --background-color: rgb(255, 255, 255);
+  --text-color: rgb(33, 37, 41);
+}
+
+[data-theme='dark'] {
+  --primary-color: rgb(51, 153, 255);
+  --primary-dark: rgb(0, 102, 204);
+  --secondary-color: rgb(173, 181, 189);
+  --background-color: rgb(18, 18, 18);
+  --text-color: rgb(255, 255, 255);
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+/* Animation utilities */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Progress bar animation */
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-progress {
+  animation: progress 2s ease-in-out infinite;
+}
+
+/* Custom component styles */
+.file-upload {
+  border: 2px dashed var(--secondary-color);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-upload:hover {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.file-upload.dragging {
+  border-color: var(--primary-color);
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+.progress-bar {
+  height: 4px;
+  background-color: var(--secondary-color);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}

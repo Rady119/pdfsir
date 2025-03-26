@@ -1,0 +1,77 @@
+{
+  "sortedMiddleware": [
+    "/"
+  ],
+  "middleware": {
+    "/": {
+      "files": [
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/src/middleware.js"
+      ],
+      "name": "src/middleware",
+      "page": "/",
+      "matchers": [
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/dashboard(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/dashboard/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/tools(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/tools/:path*"
+        }
+      ],
+      "wasm": [],
+      "assets": []
+    }
+  },
+  "functions": {
+    "/api/merge/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/merge/route.js"
+      ],
+      "name": "app/api/merge/route",
+      "page": "/api/merge/route",
+      "matchers": [
+        {
+          "regexp": "^/api/merge$",
+          "originalSource": "/api/merge"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "fra1"
+      ]
+    },
+    "/api/compress/route": {
+      "files": [
+        "server/middleware-build-manifest.js",
+        "server/middleware-react-loadable-manifest.js",
+        "server/next-font-manifest.js",
+        "prerender-manifest.js",
+        "server/edge-runtime-webpack.js",
+        "server/app/api/compress/route.js"
+      ],
+      "name": "app/api/compress/route",
+      "page": "/api/compress/route",
+      "matchers": [
+        {
+          "regexp": "^/api/compress$",
+          "originalSource": "/api/compress"
+        }
+      ],
+      "wasm": [],
+      "assets": [],
+      "regions": [
+        "fra1"
+      ]
+    }
+  },
+  "version": 2
+}

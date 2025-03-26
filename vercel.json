@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "regions": ["fra1"],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://your-username:your-password@cluster0.mongodb.net/pdf-processor?retryWrites=true&w=majority",
+    "NEXTAUTH_SECRET": "your-secret-key",
+    "CONVERTAPI_SECRET": "secret_NCecjiNMQtoO2UAS",
+    "GOOGLE_CLIENT_ID": "23269676162-1p2lds26l0b0sk9jq4noklf7bdhqsvti.apps.googleusercontent.com",
+    "GOOGLE_CLIENT_SECRET": "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",
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "587",
+    "SMTP_USER": "pdftool37@gmail.com",
+    "SMTP_PASS": "dhud vhts jcbr rnkp",
+    "SMTP_FROM": "pdftool37@gmail.com",
+    "CONTACT_EMAIL": "pdftool37@gmail.com"
+  }
+}

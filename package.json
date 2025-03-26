@@ -1,0 +1,46 @@
+{
+  "name": "pdf-processor",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@heroicons/react": "^2.0.18",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@types/sharp": "^0.31.1",
+    "autoprefixer": "^10.0.0",
+    "axios": "^1.8.2",
+    "bcryptjs": "^3.0.2",
+    "convertapi": "^1.15.0",
+    "date-fns": "^4.1.0",
+    "docx": "^9.2.0",
+    "framer-motion": "^10.16.4",
+    "i18next": "^23.16.8",
+    "jszip": "^3.10.1",
+    "mongoose": "^7.0.0",
+    "next": "13.5.4",
+    "next-auth": "^4.0.0",
+    "next-i18next": "^14.0.3",
+    "next-themes": "^0.4.6",
+    "nodemailer": "^6.10.0",
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "postcss": "^8.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-i18next": "^13.5.0",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/pdf-parse": "^1.1.4",
+    "typescript": "^5.8.2"
+  }
+}

@@ -1,0 +1,227 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-color: #eab308;  /* Yellow-500 */
+  --primary-hover: #ca8a04;  /* Yellow-600 */
+  --background-light: #f8fafc;  /* Slate-50 */
+  --background-dark: #0f172a;  /* Slate-900 */
+  --text-light: #1e293b;  /* Slate-800 */
+  --text-dark: #e2e8f0;  /* Slate-200 */
+}
+
+/* Base Styles */
+body {
+  background-color: var(--background-light);
+  color: var(--text-light);
+  transition: background-color var(--transition-duration) ease,
+              color var(--transition-duration) ease;
+}
+
+.dark body {
+  background-color: var(--background-dark);
+  color: var(--text-dark);
+}
+
+/* Social Icons */
+.social-icons {
+  @apply relative py-3 px-5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md rounded-lg shadow-lg border border-gray-100/50 dark:border-gray-700/50 hover:shadow-xl;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.social-icons:hover {
+  @apply transform -translate-y-0.5 scale-[1.01];
+  border-color: currentColor;
+}
+
+.social-icons p {
+  @apply text-sm font-semibold text-gray-400 dark:text-white relative z-10;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-icons:hover p {
+  @apply transform -translate-y-0.5;
+}
+
+.social-icons .follow-button {
+  @apply text-sm font-medium z-10 relative;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.social-icons:hover .follow-button {
+  opacity: 1;
+  transform: translateX(0);
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.social-icons .follow-button:hover {
+  @apply font-semibold;
+}
+
+.social-icons svg.icon {
+  @apply absolute right-3 h-6 w-6;
+  opacity: 0.15;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.social-icons.x-twitter svg.icon {
+  opacity: 0.2;
+}
+
+.social-icons:hover svg.icon {
+  transform: scale(2.2) translate(15%, -15%) rotate(5deg);
+  opacity: 3.1;
+}
+
+.social-icons.x-twitter:hover svg.icon {
+  transform: scale(2.8) translate(15%, -15%) rotate(-5deg);
+}
+
+/* Platform-specific styles */
+.social-icons.x-twitter .follow-button {
+  @apply text-black dark:text-white;
+}
+
+.social-icons.x-twitter:hover {
+  @apply border-black/50 dark:border-white/50;
+}
+
+.social-icons.facebook .follow-button {
+  @apply text-[#1877F2] dark:text-[#4267B2];
+}
+
+.social-icons.facebook:hover {
+  @apply border-[#1877F2]/50 dark:border-[#4267B2]/50;
+}
+
+.social-icons.linkedin .follow-button {
+  @apply text-[#0A66C2] dark:text-[#0A88FF];
+}
+
+.social-icons.linkedin:hover {
+  @apply border-[#0A66C2]/50 dark:border-[#0A88FF]/50;
+}
+
+.social-icons.linkedin:hover svg.icon {
+  transform: scale(2.8) translate(15%, -15%) rotate(0deg);
+  opacity: 3.1;
+}
+
+.social-icons.youtube .follow-button {
+  @apply text-[#F61C0D] dark:text-[#FF6B6B];
+  
+}
+
+.social-icons.youtube:hover {
+  @apply border-[#F61C0D]/50;
+  
+}
+
+.social-icons.tiktok .follow-button {
+  @apply text-black dark:text-white;
+}
+
+.social-icons.tiktok:hover {
+  @apply border-black/50 dark:border-white/50;
+}
+
+.social-icons.instagram .follow-button {
+  @apply text-[#FF1493] dark:text-[#FF69B4];
+}
+
+.social-icons.instagram:hover {
+  @apply border-[#FF1493]/50;
+}
+
+/* Card Styles */
+.card {
+  @apply bg-white dark:bg-gray-700 rounded-lg shadow-md p-6 hover:shadow-lg transition-all;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Button Styles */
+.btn {
+  @apply px-4 py-2 rounded-lg transition duration-300;
+}
+
+.btn-primary {
+  @apply bg-yellow-300 text-gray-800 hover:bg-yellow-400;
+}
+
+/* RTL Support */
+html[dir="rtl"] .card,
+html[dir="rtl"] .btn {
+  text-align: right;
+}
+
+/* Progress Bar */
+.progress-bar {
+  @apply h-1 bg-transparent fixed top-0 left-0 right-0 z-50;
+}
+
+.progress-bar-fill {
+  @apply h-full bg-yellow-300 transition-all duration-300;
+}
+
+/* File Upload */
+.file-upload {
+  @apply border-2 border-dashed border-gray-300 hover:border-yellow-300 rounded-lg p-8 text-center cursor-pointer transition-all;
+}
+
+.file-upload.dragging {
+  @apply border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20;
+}
+
+/* Custom gradients */
+.gradient-bg {
+  @apply bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-gray-800;
+}
+
+/* Animation Classes */
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+.transition-300 {
+  transition: all 0.3s ease;
+}
+
+/* Dark Mode Colors */
+.dark .card {
+  @apply bg-gray-800 text-gray-100;
+}
+
+.dark .btn-primary {
+  @apply bg-yellow-500 text-white hover:bg-yellow-600;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
