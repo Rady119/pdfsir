@@ -66,7 +66,7 @@ export default function SignUp() {
         throw new Error(result.error);
       }
 
-      router.push('/dashboard');
+      router.push('/tools');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
@@ -181,7 +181,7 @@ export default function SignUp() {
 
           <div className="mt-6 grid grid-cols-2 gap-3" dir="ltr">
             <button
-              onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+              onClick={() => signIn('google', { callbackUrl: '/tools' })}
               className="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -206,7 +206,7 @@ export default function SignUp() {
             </button>
 
             <button
-              onClick={() => signIn('facebook', { callbackUrl: '/dashboard' })}
+              onClick={() => signIn('facebook', { callbackUrl: '/tools' })}
               className="flex w-full items-center justify-center gap-3 rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <svg className="h-5 w-5" fill="#1877F2" viewBox="0 0 24 24">

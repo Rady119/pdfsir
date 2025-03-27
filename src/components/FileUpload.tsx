@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { ProcessingOptions } from '@/types'
+import { CloudArrowUpIcon, DocumentIcon, CheckCircleIcon } from '@heroicons/react/24/outline'
 
 interface FileUploadProps {
   onUpload: (file: File) => Promise<void>
@@ -24,13 +25,18 @@ export function FileUpload({
   const [error, setError] = useState<string>('')
   const [progress, setProgress] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const [isCompleted, setIsCompleted] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFile = async (file: File) => {
     setLoading(true)
     setError('')
+    setIsCompleted(false)
     try {
       await onUpload(file)
+      setIsCompleted(true)
+      // Reset completion status after 3 seconds
+      setTimeout(() => setIsCompleted(false), 3000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
@@ -54,12 +60,30 @@ export function FileUpload({
     try {
       setLoading(true)
       setError('')
+      setIsCompleted(false)
       await onUpload(pdfFiles[0])
+      setIsCompleted(true)
+      // Reset completion status after 3 seconds
+      setTimeout(() => setIsCompleted(false), 3000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
     } finally {
       setLoading(false)
     }
+  }
+
+  const getBorderColor = () => {
+    if (isCompleted) return 'border-green-500'
+    if (isDragging) return 'border-blue-400'
+    if (isProcessing || loading) return 'border-yellow-400'
+    return 'border-gray-200 hover:border-blue-400'
+  }
+
+  const getBackgroundColor = () => {
+    if (isCompleted) return 'bg-green-50 dark:bg-green-900/20'
+    if (isDragging) return 'bg-blue-50 dark:bg-blue-900/20'
+    if (isProcessing || loading) return 'bg-yellow-50 dark:bg-yellow-900/20'
+    return 'bg-white dark:bg-gray-800'
   }
 
   return (
@@ -88,15 +112,13 @@ export function FileUpload({
         }}
         onDrop={handleDrop}
         className={`
-          w-full p-8 border-2 border-dashed rounded-lg 
-          transition-all duration-200 ease-in-out
-          ${isDragging 
-            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-            : 'border-gray-300 hover:border-blue-500 dark:border-gray-600'
-          }
+          relative w-full p-8 border-2 border-dashed rounded-xl
+          transition-all duration-300 ease-in-out
+          ${getBorderColor()}
+          ${getBackgroundColor()}
           ${isProcessing || loading 
-            ? 'opacity-75 cursor-wait' 
-            : 'cursor-pointer hover:shadow-lg hover:scale-105'
+            ? 'opacity-90 cursor-wait' 
+            : 'cursor-pointer transform hover:shadow-lg hover:scale-102 hover:shadow-blue-100 dark:hover:shadow-blue-900/30'
           }
         `}
       >
@@ -112,36 +134,59 @@ export function FileUpload({
           disabled={loading || isProcessing}
         />
         
-        <div className="text-center space-y-4">
-          <div className="text-5xl">
-            {isDragging ? '📄' : '📁'}
-          </div>
-          <div className="text-lg">
+        <div className="text-center space-y-6">
+          {isCompleted ? (
+            <div className="flex justify-center">
+              <CheckCircleIcon className="w-16 h-16 text-green-500" />
+            </div>
+          ) : (
+            <div className="flex justify-center">
+              {isDragging ? (
+                <DocumentIcon className="w-16 h-16 text-blue-500 animate-pulse" />
+              ) : (
+                <CloudArrowUpIcon className="w-16 h-16 text-blue-400" />
+              )}
+            </div>
+          )}
+          
+          <div className="text-lg font-medium text-gray-700 dark:text-gray-200">
             {loading || isProcessing
               ? processingText || `Processing... ${progress}%`
-              : isDragging
-                ? 'Drop your PDF here'
-                : 'Drag & drop your PDF here or click to browse'
+              : isCompleted
+                ? 'Conversion completed!'
+                : isDragging
+                  ? 'Drop your file here'
+                  : 'Drag & drop your file here or click to browse'
             }
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            Supports PDF files up to 10MB
+            Supports {accept.replace(/\./g, '').toUpperCase()} files up to 10MB
           </div>
         </div>
 
         {(loading || isProcessing) && (
-          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full mt-4">
-            <div 
-              className="h-full bg-blue-600 rounded-full transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
+          <div className="w-full mt-6">
+            <div className="w-full h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full transition-all duration-300 ease-out"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {isCompleted && (
+          <div className="absolute top-4 right-4">
+            <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+              <CheckCircleIcon className="w-6 h-6 text-white" />
+            </div>
           </div>
         )}
       </div>
       
       {error && (
-        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-600 dark:text-red-400">
-          {error}
+        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
     </div>

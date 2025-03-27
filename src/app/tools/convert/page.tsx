@@ -82,7 +82,7 @@ export default function ConvertPage() {
       });
 
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 300000);
+      const timeout = setTimeout(() => controller.abort(), selectedFormat === 'docx' ? 150000 : 90000); // 2.5 minutes for DOCX, 1.5 minutes for others
 
       const response = await fetch('/api/convert', {
         method: 'POST',
@@ -90,8 +90,13 @@ export default function ConvertPage() {
         headers: {
           'Accept': 'application/json',
         },
-        signal: controller.signal
+        signal: controller.signal,
+        keepalive: true
       }).finally(() => clearTimeout(timeout));
+
+      if (response.status === 504) {
+        throw new Error('عملية التحويل استغرقت وقتاً طويلاً. يرجى المحاولة بملف أصغر حجماً أو تقسيم الملف إلى أجزاء أصغر');
+      }
 
       if (!response.ok) {
         const errorData = await response.json();

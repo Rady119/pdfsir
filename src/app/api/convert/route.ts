@@ -15,6 +15,10 @@ export async function OPTIONS() {
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
+interface ConvertAPIResponse {
+  Files?: Array<{ Url: string }>;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Validate API key
@@ -80,164 +84,144 @@ export async function POST(request: NextRequest) {
       // Validate format
       const supportedFormats: Record<string, string> = isImageToPdf
         ? { pdf: 'jpg/to/pdf,png/to/pdf' }
-        : {
-            docx: 'pdf/to/docx,pdf/to/pdfdoc'
-          };
+        : { docx: 'pdf/to/docx,pdf/to/pdfdoc' };
 
       if (!format || !supportedFormats[format as string]) {
         throw new Error(`Format not supported: ${format}`);
       }
 
-      const baseUrls = [
-        'https://v1.convertapi.com',
-        'https://v2.convertapi.com',
-        'https://api.convertapi.com'
-      ];
+      const baseUrl = 'https://v2.convertapi.com';
+      const conversionTimeout = format === 'docx' ? 120 : 60;
+      const conversionPath = isImageToPdf ? `${file.type.split('/')[1]}/to/pdf` : supportedFormats[format as string];
+      const apiUrl = `${baseUrl}/convert/${conversionPath}?Secret=${convertApiSecret}&StoreFile=true&Timeout=${conversionTimeout}`;
 
-      let response;
-      let lastError;
-      
-      // Try different API endpoints with retry logic
-      for (const baseUrl of baseUrls) {
-        let attempts = 0;
-        const maxAttempts = 3;
-        // Increase timeout for DOCX conversions as they take longer
-        const conversionTimeout = format === 'docx' ? 300 : 180;
-        const conversionPath = isImageToPdf ? `${file.type.split('/')[1]}/to/pdf` : supportedFormats[format as string];
-        const apiUrl = `${baseUrl}/convert/${conversionPath}?Secret=${convertApiSecret}&StoreFile=true&Timeout=${conversionTimeout}`;
+      let convertedResponse: ConvertAPIResponse | null = null;
+      let conversionError: Error | null = null;
 
-        // Debug logging
-        console.log('Conversion request:', {
-          baseUrl,
-          conversionPath,
-          format,
-          isImageToPdf,
-          fileType: file.type,
-          fileName: file.name
-        });
+      // Debug logging
+      console.log('Conversion request:', {
+        baseUrl,
+        conversionPath,
+        format,
+        isImageToPdf,
+        fileType: file.type,
+        fileName: file.name
+      });
 
-        while (attempts < maxAttempts) {
-          try {
-            console.log(`Trying ${baseUrl}, attempt ${attempts + 1} of ${maxAttempts}...`);
+      const maxAttempts = 2;
+      for (let attempt = 0; attempt < maxAttempts; attempt++) {
+        try {
+          console.log(`Attempt ${attempt + 1} of ${maxAttempts}...`);
 
-            // Create blob with proper content type
-            const sourceFileBuffer = await file.arrayBuffer();
-            const contentType = isImageToPdf ? file.type : 'application/pdf';
-            const fileBlob = new Blob([sourceFileBuffer], { type: contentType });
-            
-            // Create form data with all parameters
-            const apiFormData = new FormData();
-            apiFormData.append('File', fileBlob, file.name);
-            apiFormData.append('StoreFile', 'true');
-            apiFormData.append('Timeout', '180');
-            
-            // Add specific parameters for PDF to DOCX conversion
-            if (!isImageToPdf && format === 'docx') {
-              apiFormData.append('OCR', 'true');
-              apiFormData.append('TextRecognition', 'true');
-              apiFormData.append('FromPage', '1');
-              apiFormData.append('ToPage', '0'); // 0 means all pages
-            }
-
-            const controller = new AbortController();
-            const timeoutMs = format === 'docx' ? 300000 : 180000; // 5 minutes for DOCX, 3 minutes for others
-            const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-            const fetchResponse = await fetch(apiUrl, {
-              method: 'POST',
-              body: apiFormData,
-              signal: controller.signal
-            }).finally(() => clearTimeout(timeout));
-
-            console.log('Response status:', fetchResponse.status);
-            
-            if (fetchResponse.status === 415) {
-              const errorText = await fetchResponse.text();
-              console.error('415 Error details:', errorText);
-              throw new Error(`Unsupported Media Type: ${errorText}`);
-            }
-
-            if (!fetchResponse.ok) {
-              throw new Error(`HTTP error! status: ${fetchResponse.status}`);
-            }
-
-            response = await fetchResponse.json();
-            
-            // If successful, break out of both loops
-            if (response) {
-              console.log('Conversion request successful');
-              break;
-            }
-          } catch (err: any) {
-            lastError = err;
-            
-            if (err.name === 'AbortError') {
-              const timeoutMessage = format === 'docx'
-                ? 'عملية تحويل PDF إلى Word استغرقت وقتاً طويلاً. يرجى المحاولة مع ملف أصغر حجماً'
-                : 'عملية التحويل استغرقت وقتاً طويلاً. يرجى المحاولة مرة أخرى';
-              console.error('Request timed out:', format === 'docx' ? '5 minutes' : '3 minutes');
-              throw new Error(timeoutMessage);
-            }
-            
-            console.error(`Attempt ${attempts + 1} failed:`, err.message);
-            
-            // Wait before retrying (exponential backoff)
-            await delay(Math.pow(2, attempts) * 1000);
-            attempts++;
+          // Create blob with proper content type
+          const sourceFileBuffer = await file.arrayBuffer();
+          const contentType = isImageToPdf ? file.type : 'application/pdf';
+          const fileBlob = new Blob([sourceFileBuffer], { type: contentType });
+          
+          // Create form data with all parameters
+          const apiFormData = new FormData();
+          apiFormData.append('File', fileBlob, file.name);
+          apiFormData.append('StoreFile', 'true');
+          apiFormData.append('Timeout', conversionTimeout.toString());
+          
+          // Add specific parameters for PDF to DOCX conversion
+          if (!isImageToPdf && format === 'docx') {
+            apiFormData.append('OCR', 'true');
+            apiFormData.append('TextRecognition', 'true');
+            apiFormData.append('FromPage', '1');
+            apiFormData.append('ToPage', '0'); // 0 means all pages
           }
-        }
 
-        // If we got a successful response, break out of the baseUrl loop
-        if (response) {
+          // Set a reasonable timeout for the conversion request
+          const controller = new AbortController();
+          const timeoutMs = format === 'docx' ? 120000 : 60000; // 2 minutes for DOCX, 1 minute for others
+          const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+          const fetchResponse = await fetch(apiUrl, {
+            method: 'POST',
+            body: apiFormData,
+            signal: controller.signal,
+            keepalive: true
+          }).finally(() => clearTimeout(timeout));
+
+          console.log('Response status:', fetchResponse.status);
+          
+          if (fetchResponse.status === 415) {
+            const errorText = await fetchResponse.text();
+            console.error('415 Error details:', errorText);
+            throw new Error(`Unsupported Media Type: ${errorText}`);
+          }
+
+          if (!fetchResponse.ok) {
+            throw new Error(`HTTP error! status: ${fetchResponse.status}`);
+          }
+
+          convertedResponse = await fetchResponse.json();
+          console.log('Conversion request successful');
           break;
+
+        } catch (err: any) {
+          conversionError = err;
+          
+          if (err.name === 'AbortError') {
+            const timeoutMessage = format === 'docx'
+              ? 'عملية تحويل PDF إلى Word استغرقت وقتاً طويلاً. يرجى المحاولة مع ملف أصغر حجماً'
+              : 'عملية التحويل استغرقت وقتاً طويلاً. يرجى المحاولة مرة أخرى';
+            console.error('Request timed out:', format === 'docx' ? '2 minutes' : '1 minute');
+            throw new Error(timeoutMessage);
+          }
+          
+          console.error(`Attempt ${attempt + 1} failed:`, err.message);
+          
+          if (attempt < maxAttempts - 1) {
+            await delay(Math.pow(2, attempt) * 1000);
+          }
         }
       }
 
       // If all attempts failed
-      if (!response) {
-        throw lastError || new Error('All conversion attempts failed');
+      if (!convertedResponse) {
+        throw conversionError || new Error('All conversion attempts failed');
       }
 
-      console.log('Processing response...');
-
-      if (!response?.Files?.[0]?.Url) {
+      if (!convertedResponse.Files?.[0]?.Url) {
         throw new Error('لم يتم استلام رابط الملف المحول');
       }
 
       // Download converted file
       console.log('Downloading converted file...');
-     const controller = new AbortController();
-     const timeout = setTimeout(() => controller.abort(), 60000); // 1 minute timeout for download
+      const downloadController = new AbortController();
+      const downloadTimeout = setTimeout(() => downloadController.abort(), 60000); // 1 minute timeout for download
 
-     const fileResponse = await fetch(response.Files[0].Url, {
-       signal: controller.signal
-     }).finally(() => clearTimeout(timeout));
+      const fileResponse = await fetch(convertedResponse.Files[0].Url, {
+        signal: downloadController.signal
+      }).finally(() => clearTimeout(downloadTimeout));
 
-     if (!fileResponse.ok) {
-       throw new Error('Failed to download converted file');
-     }
+      if (!fileResponse.ok) {
+        throw new Error('Failed to download converted file');
+      }
 
-     const contentTypes = {
-       docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-       pdf: 'application/pdf'
-     };
+      const contentTypes = {
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        pdf: 'application/pdf'
+      };
 
-     const outputFormat = isImageToPdf ? 'pdf' : format as keyof typeof contentTypes;
+      const outputFormat = isImageToPdf ? 'pdf' : format as keyof typeof contentTypes;
 
-     // Ensure Arabic filename is properly encoded
-     const originalName = file.name.replace(/\.[^/.]+$/, ''); // Remove old extension
-     const encodedFilename = encodeURIComponent(originalName);
-     
-     // Stream the response directly with proper headers for Arabic filename
-     return new Response(fileResponse.body, {
-       headers: {
-         ...responseHeaders,
-         'Content-Type': contentTypes[outputFormat],
-         'Content-Disposition': `attachment; filename="${encodedFilename}.${outputFormat}"; filename*=UTF-8''${encodedFilename}.${outputFormat}`,
-         'Transfer-Encoding': 'chunked',
-         'Cache-Control': 'no-cache'
-       }
-     });
+      // Ensure Arabic filename is properly encoded
+      const originalName = file.name.replace(/\.[^/.]+$/, ''); // Remove old extension
+      const encodedFilename = encodeURIComponent(originalName);
+      
+      // Stream the response directly with proper headers for Arabic filename
+      return new Response(fileResponse.body, {
+        headers: {
+          ...responseHeaders,
+          'Content-Type': contentTypes[outputFormat],
+          'Content-Disposition': `attachment; filename="${encodedFilename}.${outputFormat}"; filename*=UTF-8''${encodedFilename}.${outputFormat}`,
+          'Transfer-Encoding': 'chunked',
+          'Cache-Control': 'no-cache'
+        }
+      });
 
     } catch (conversionError: any) {
       console.error('Conversion error:', {
@@ -250,7 +234,6 @@ export async function POST(request: NextRequest) {
         errorMessage += `: ${conversionError.message}`;
       }
 
-      // Create a structured error response
       return NextResponse.json({
         error: errorMessage,
         details: {
@@ -265,7 +248,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (error: any) {
     console.error('Server error:', error);
-    // Create a structured error response for general errors
     return NextResponse.json({
       error: 'حدث خطأ غير متوقع. الرجاء المحاولة مرة أخرى',
       details: {
