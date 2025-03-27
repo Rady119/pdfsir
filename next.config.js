@@ -13,12 +13,7 @@ const nextConfig = {
       path: false,
     };
     return config;
-  },
-  experimental: {
-    serverOptions: {
-      timeoutInSeconds: 300, // 5 minutes
-    },
-  },
+  }
 }
 
 module.exports = nextConfig
