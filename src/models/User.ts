@@ -29,4 +29,12 @@ const userSchema = new Schema<IUser>({
   timestamps: true,
 });
 
-export const User = models.User || model<IUser>('User', userSchema);
+// Prevent multiple model initialization during hot reloading
+let UserModel: mongoose.Model<IUser>;
+try {
+  UserModel = mongoose.model<IUser>('User');
+} catch {
+  UserModel = mongoose.model<IUser>('User', userSchema);
+}
+
+export const User = UserModel;

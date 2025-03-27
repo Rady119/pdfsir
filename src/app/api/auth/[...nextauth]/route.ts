@@ -1,4 +1,11 @@
-import NextAuth from 'next-auth';
+import NextAuth, { 
+  NextAuthOptions, 
+  Session, 
+  DefaultSession,
+  Account,
+  Profile
+} from 'next-auth';
+import { JWT } from 'next-auth/jwt';
 import GoogleProvider from 'next-auth/providers/google';
 import FacebookProvider from 'next-auth/providers/facebook';
 import CredentialsProvider from 'next-auth/providers/credentials';
@@ -6,7 +13,28 @@ import { verifyPassword } from '@/lib/auth';
 import { User } from '@/models/User';
 import connectDB from '@/lib/db';
 
-const handler = NextAuth({
+declare module 'next-auth' {
+  interface Session extends DefaultSession {
+    user: {
+      id: string;
+      subscription?: string;
+    } & DefaultSession['user']
+  }
+
+  interface CustomUser {
+    id: string;
+    email: string;
+    subscription?: string;
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    subscription?: string;
+  }
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -45,11 +73,10 @@ const handler = NextAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    // Commented out until Facebook credentials are provided
-    /*FacebookProvider({
+    FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID!,
       clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
-    }),*/
+    }),
   ],
   pages: {
     signIn: '/auth/signin',
@@ -58,20 +85,21 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.subscription = user.subscription;
+        token.subscription = (user as { subscription?: string }).subscription;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.subscription = token.subscription as string;
+        session.user.subscription = token.subscription;
       }
       return session;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
 
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
 
 // Must use nodejs runtime for bcryptjs and database operations

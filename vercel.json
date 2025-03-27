@@ -7,9 +7,12 @@
   "env": {
     "MONGODB_URI": "mongodb+srv://your-username:your-password@cluster0.mongodb.net/pdf-processor?retryWrites=true&w=majority",
     "NEXTAUTH_SECRET": "your-secret-key",
+    "NEXTAUTH_URL": "https://pdf-processor-jcw7z0erm-abdelradys-projects.vercel.app",
     "CONVERTAPI_SECRET": "secret_NCecjiNMQtoO2UAS",
     "GOOGLE_CLIENT_ID": "23269676162-1p2lds26l0b0sk9jq4noklf7bdhqsvti.apps.googleusercontent.com",
     "GOOGLE_CLIENT_SECRET": "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",
+    "FACEBOOK_CLIENT_ID": "3121127578051818",
+    "FACEBOOK_CLIENT_SECRET": "cbb334769f9c2b677c6ebbcfc86ee44a",
     "SMTP_HOST": "smtp.gmail.com",
     "SMTP_PORT": "587",
     "SMTP_USER": "pdftool37@gmail.com",

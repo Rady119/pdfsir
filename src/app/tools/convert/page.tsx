@@ -146,17 +146,17 @@ export default function ConvertPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Responsive Navigation */}
-      <nav className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+      <nav className="bg-white dark:bg-gray-800 shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold text-gray-800">PDF Tools</h1>
+              <h1 className="text-xl font-bold text-gray-800 dark:text-white">PDF Tools</h1>
             </div>
             <div className="flex items-center">
               {!isSubscribed && (
-                <span className="hidden sm:block text-sm text-gray-600 text-right" dir="rtl">
+                <span className="hidden sm:block text-sm text-gray-600 dark:text-gray-300 text-right" dir="rtl">
                   التحويلات المتبقية: {MAX_FREE_CONVERSIONS - conversionCount}
                 </span>
               )}
@@ -168,19 +168,19 @@ export default function ConvertPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-xl mx-auto pt-24 sm:pt-28 pb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center text-gray-800 dark:text-white">
             {selectedFormat === 'pdf' ? 'Convert Images to PDF' : 'Convert PDF'}
           </h2>
           
           {/* Format Selection */}
           <div className="mb-6 sm:mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
               {selectedFormat === 'pdf' ? 'Convert from:' : 'Convert to:'}
             </label>
             <select
               value={selectedFormat}
               onChange={(e) => setSelectedFormat(e.target.value as ConversionFormat)}
-              className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition duration-300"
+              className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-500 transition duration-300"
               disabled={isConverting}
             >
               {formats.map(format => (
@@ -206,7 +206,7 @@ export default function ConvertPage() {
           {/* Error Message */}
           {error && (
             <div className="mb-6 sm:mb-8">
-              <div className="p-3 sm:p-4 bg-red-100 text-red-700 rounded-lg text-right" dir="rtl">
+              <div className="p-3 sm:p-4 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-right" dir="rtl">
                 {error}
               </div>
             </div>
@@ -215,11 +215,11 @@ export default function ConvertPage() {
           {/* Subscription Form */}
           {showSubscription && (
             <div className="mb-6 sm:mb-8">
-              <div className="p-6 sm:p-8 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 text-right">
+              <div className="p-6 sm:p-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4 text-right">
                   لقد استخدمت الحد الأقصى للتحويلات المجانية
                 </h3>
-                <p className="text-gray-600 mb-4 text-right">
+                <p className="text-gray-600 dark:text-gray-300 mb-4 text-right">
                   للاستمرار في استخدام الخدمة، يرجى الاشتراك عن طريق إدخال بريدك الإلكتروني
                 </p>
                 <form onSubmit={handleSubscribe} className="space-y-4">
@@ -228,7 +228,7 @@ export default function ConvertPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="البريد الإلكتروني"
-                    className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-300"
+                    className="w-full px-4 py-2 sm:py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-yellow-300 dark:focus:ring-yellow-500"
                     required
                     dir="rtl"
                   />
@@ -247,15 +247,15 @@ export default function ConvertPage() {
           {/* Mobile Conversions Counter */}
           {!showSubscription && !isSubscribed && (
             <div className="sm:hidden mb-6">
-              <p className="text-sm text-gray-600 text-center" dir="rtl">
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center" dir="rtl">
                 التحويلات المتبقية: {MAX_FREE_CONVERSIONS - conversionCount}
               </p>
             </div>
           )}
 
           {/* Instructions */}
-          <div className="text-sm text-gray-600 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
-            <h2 className="font-semibold mb-3 text-lg">Instructions:</h2>
+          <div className="text-sm text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow-sm">
+            <h2 className="font-semibold mb-3 text-lg text-gray-800 dark:text-white">Instructions:</h2>
             <ul className="list-disc list-inside space-y-2">
               <li>
                 {selectedFormat === 'pdf' 
