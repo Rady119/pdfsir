@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://pdfsir-drab.vercel.app/sitemap.xml
+Sitemap: https://pdfsir-chi.vercel.app/sitemap.xml
