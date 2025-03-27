@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://pdftoolz.com'),
+  metadataBase: new URL('https://pdfsir-drab.vercel.app/'),
   title: 'PDF Tools - Convert, Merge, and Edit PDFs Online',
   description: 'Free online PDF tools to convert, merge, and edit your PDF files easily.',
   verification: {

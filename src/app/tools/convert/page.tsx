@@ -3,6 +3,7 @@
 import { FileUpload } from '@/components/FileUpload';
 import { ProcessingOptions } from '@/types';
 import { FormEvent, useEffect, useState } from 'react';
+import { useLocalStorage } from '@/hooks/useLocalStorage';
 
 type ConversionFormat = 'docx' | 'pdf';
 
@@ -14,17 +15,15 @@ export default function ConvertPage() {
   const [progress, setProgress] = useState(0);
   const [isConverting, setIsConverting] = useState(false);
   const [acceptedFiles, setAcceptedFiles] = useState<string>('.jpg,.jpeg,.png');
-  const [conversionCount, setConversionCount] = useState(0);
+  const [conversionCount, setConversionCount] = useLocalStorage('conversionCount', 0);
+  const [isSubscribed, setIsSubscribed] = useLocalStorage('isSubscribed', false);
   const [showSubscription, setShowSubscription] = useState(false);
   const [email, setEmail] = useState('');
   const [isSubscribing, setIsSubscribing] = useState(false);
   
-  // Load conversion count from localStorage on mount
   useEffect(() => {
-    const count = parseInt(localStorage.getItem('conversionCount') || '0');
-    setConversionCount(count);
-    setShowSubscription(count >= MAX_FREE_CONVERSIONS);
-  }, []);
+    setShowSubscription(conversionCount >= MAX_FREE_CONVERSIONS && !isSubscribed);
+  }, [conversionCount, isSubscribed]);
 
   const formats = [
     { value: 'pdf' as ConversionFormat, label: 'PDF from Images', accept: '.jpg,.jpeg,.png' },
@@ -50,7 +49,7 @@ export default function ConvertPage() {
     setIsSubscribing(true);
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
-      localStorage.setItem('isSubscribed', 'true');
+      setIsSubscribed(true);
       setShowSubscription(false);
     } catch (err) {
       setError('فشل في الاشتراك. الرجاء المحاولة مرة أخرى.');
@@ -60,7 +59,7 @@ export default function ConvertPage() {
   };
 
   const handleConvert = async (file: File) => {
-    if (conversionCount >= MAX_FREE_CONVERSIONS && !localStorage.getItem('isSubscribed')) {
+    if (conversionCount >= MAX_FREE_CONVERSIONS && !isSubscribed) {
       setShowSubscription(true);
       return;
     }
@@ -118,9 +117,8 @@ export default function ConvertPage() {
 
       const newCount = conversionCount + 1;
       setConversionCount(newCount);
-      localStorage.setItem('conversionCount', newCount.toString());
       
-      if (newCount >= MAX_FREE_CONVERSIONS && !localStorage.getItem('isSubscribed')) {
+      if (newCount >= MAX_FREE_CONVERSIONS && !isSubscribed) {
         setShowSubscription(true);
       }
     } catch (err: any) {
@@ -157,7 +155,7 @@ export default function ConvertPage() {
               <h1 className="text-xl font-bold text-gray-800">PDF Tools</h1>
             </div>
             <div className="flex items-center">
-              {!localStorage.getItem('isSubscribed') && (
+              {!isSubscribed && (
                 <span className="hidden sm:block text-sm text-gray-600 text-right" dir="rtl">
                   التحويلات المتبقية: {MAX_FREE_CONVERSIONS - conversionCount}
                 </span>
@@ -247,7 +245,7 @@ export default function ConvertPage() {
           )}
 
           {/* Mobile Conversions Counter */}
-          {!showSubscription && !localStorage.getItem('isSubscribed') && (
+          {!showSubscription && !isSubscribed && (
             <div className="sm:hidden mb-6">
               <p className="text-sm text-gray-600 text-center" dir="rtl">
                 التحويلات المتبقية: {MAX_FREE_CONVERSIONS - conversionCount}

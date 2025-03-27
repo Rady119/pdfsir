@@ -1,11 +1,12 @@
 {
-  "/api/merge/route": "/api/merge",
   "/api/compress/route": "/api/compress",
+  "/api/merge/route": "/api/merge",
   "/_not-found": "/_not-found",
   "/page": "/",
   "/about/page": "/about",
   "/blog/page": "/blog",
   "/contact/page": "/contact",
+  "/google713cd6faffb6ca9e.html/route": "/google713cd6faffb6ca9e.html",
   "/pricing/page": "/pricing",
   "/tools/page": "/tools",
   "/dashboard/page": "/dashboard",
@@ -15,10 +16,10 @@
   "/auth/signup/page": "/auth/signup",
   "/blog/[slug]/page": "/blog/[slug]",
   "/tools/compress/page": "/tools/compress",
-  "/tools/convert/page": "/tools/convert",
   "/tools/merge/page": "/tools/merge",
+  "/tools/convert/page": "/tools/convert",
   "/api/convert/route": "/api/convert",
   "/tools/[tool]/page": "/tools/[tool]",
-  "/api/auth/register/route": "/api/auth/register",
-  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]"
+  "/api/auth/[...nextauth]/route": "/api/auth/[...nextauth]",
+  "/api/auth/register/route": "/api/auth/register"
 }

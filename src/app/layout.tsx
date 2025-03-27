@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Providers } from './providers';
 import './globals.css';
 import Script from 'next/script';
+import { SpeedInsightsWrapper } from '../components/SpeedInsightsWrapper';
 
 export const metadata: Metadata = {
   title: 'PDF Tools',
@@ -51,6 +52,7 @@ export default function RootLayout({
         <Providers>
           {children}
         </Providers>
+        <SpeedInsightsWrapper />
       </body>
     </html>
   );
