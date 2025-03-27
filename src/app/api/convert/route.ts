@@ -81,18 +81,24 @@ export async function POST(request: NextRequest) {
         fileSize: file.size
       });
       
-      // Validate format
-      const supportedFormats: Record<string, string> = isImageToPdf
-        ? { pdf: 'jpg/to/pdf,png/to/pdf' }
-        : { docx: 'pdf/to/docx,pdf/to/pdfdoc' };
-
-      if (!format || !supportedFormats[format as string]) {
-        throw new Error(`Format not supported: ${format}`);
+      // Validate format and set conversion path
+      let conversionPath: string;
+      if (isImageToPdf) {
+        if (format !== 'pdf') {
+          throw new Error('Invalid format for image conversion');
+        }
+        // Get image type (jpg or png) from the file's mime type
+        const imageType = file.type.split('/')[1];
+        conversionPath = `${imageType}/to/pdf`;
+      } else {
+        if (format !== 'docx') {
+          throw new Error('Invalid format for PDF conversion');
+        }
+        conversionPath = 'pdf/to/docx';
       }
 
       const baseUrl = 'https://v2.convertapi.com';
       const conversionTimeout = format === 'docx' ? 120 : 60;
-      const conversionPath = isImageToPdf ? `${file.type.split('/')[1]}/to/pdf` : supportedFormats[format as string];
       const apiUrl = `${baseUrl}/convert/${conversionPath}?Secret=${convertApiSecret}&StoreFile=true&Timeout=${conversionTimeout}`;
 
       let convertedResponse: ConvertAPIResponse | null = null;
@@ -152,12 +158,19 @@ export async function POST(request: NextRequest) {
             throw new Error(`Unsupported Media Type: ${errorText}`);
           }
 
+          const responseData = await fetchResponse.json();
+          console.log('API Response:', responseData);
+
           if (!fetchResponse.ok) {
-            throw new Error(`HTTP error! status: ${fetchResponse.status}`);
+            throw new Error(`API Error: ${responseData.error || `HTTP status ${fetchResponse.status}`}`);
           }
 
-          convertedResponse = await fetchResponse.json();
-          console.log('Conversion request successful');
+          if (!responseData.Files?.[0]?.Url) {
+            throw new Error('API response missing converted file URL');
+          }
+
+          convertedResponse = responseData;
+          console.log('Conversion successful, received file URL:', responseData.Files[0].Url);
           break;
 
         } catch (err: any) {
@@ -173,8 +186,22 @@ export async function POST(request: NextRequest) {
           
           console.error(`Attempt ${attempt + 1} failed:`, err.message);
           
+          // Handle specific API errors
+          if (err.message.includes('API Error')) {
+            const errorMessage = err.message.includes('Parameter validation failed')
+              ? 'عذراً، الملف غير صالح للتحويل. يرجى التحقق من نوع الملف وحجمه'
+              : err.message.includes('Conversion failed')
+                ? 'فشل في تحويل الملف. يرجى التأكد من أن الملف غير تالف'
+                : 'حدث خطأ أثناء التحويل. يرجى المحاولة مرة أخرى';
+            throw new Error(errorMessage);
+          }
+          
+          // If we have more attempts, wait before retrying
           if (attempt < maxAttempts - 1) {
+            console.log(`Waiting ${Math.pow(2, attempt)} seconds before retry...`);
             await delay(Math.pow(2, attempt) * 1000);
+          } else {
+            throw new Error('فشل في تحويل الملف بعد عدة محاولات. يرجى المحاولة مرة أخرى لاحقاً');
           }
         }
       }
