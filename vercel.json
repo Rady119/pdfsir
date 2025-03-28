@@ -4,6 +4,16 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["fra1"],
+  "routes": [
+    {
+      "src": "/sitemap.xml",
+      "headers": { "Content-Type": "application/xml" }
+    },
+    {
+      "src": "/robots.txt",
+      "headers": { "Content-Type": "text/plain" }
+    }
+  ],
   "env": {
     "MONGODB_URI": "mongodb+srv://your-username:your-password@cluster0.mongodb.net/pdf-processor?retryWrites=true&w=majority",
     "NEXTAUTH_SECRET": "your-secret-key",
